@@ -13,6 +13,7 @@
         <title>View Cart Page</title>
     </head>
     <body>
+        <jsp:include page="welcomeUser.jsp" flush="true"/>
         <c:set var="cart" value="${sessionScope.CART}"/> 
         <c:if test="${not empty cart}"> 
             <c:set var="books" value="${cart.items}"/> 

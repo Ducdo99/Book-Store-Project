@@ -42,10 +42,11 @@ public class AccountDAO implements Serializable {
             if (con != null) {
                 String selectSQL = "select lastname, isAdmin, username "
                         + "from Account "
-                        + "where username = ? and password = ?";
+                        + "where username = ? and password = ? and status = ?";
                 pstm = con.prepareStatement(selectSQL);
                 pstm.setString(1, username);
                 pstm.setString(2, password);
+                pstm.setBoolean(3, true);
                 rs = pstm.executeQuery();
                 if (rs.next()) {
                     String userName = rs.getString("username");

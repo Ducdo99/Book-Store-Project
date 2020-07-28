@@ -13,6 +13,7 @@
         <title>Shopping Page</title>
     </head>
     <body> 
+        <jsp:include page="welcomeUser.jsp" flush="true"/>
         <h1>Shopping Store</h1> 
         <c:set var="bookList" value="${requestScope.BOOKLIST}"/> 
         <c:if test="${not empty bookList}"> 

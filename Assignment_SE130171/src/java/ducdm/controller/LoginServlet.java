@@ -72,15 +72,8 @@ public class LoginServlet extends HttpServlet {
             }//end if user does not verify
 
             if (foundErr) {
+                //set error into attribute
                 request.setAttribute("SIGN_IN_ERRORS", signInErr);
-                //get ServletContext
-                ServletContext context = request.getServletContext();
-                //get attribute in ServletContext
-                Map<String, String> siteMap
-                        = (Map<String, String>) context.getAttribute("SITE_MAP");
-                //get value of label 
-                String signInErrrorPage = siteMap.get(url);
-                url = signInErrrorPage;
             } else {
                 AccountDAO dao = new AccountDAO();
                 boolean result = dao.checkLogin(username, password);
@@ -111,6 +104,15 @@ public class LoginServlet extends HttpServlet {
             log("LoginServlet_IO: " + ex.getMessage());
         } finally {
             if (foundErr) {
+                //get ServletContext
+                ServletContext context = request.getServletContext();
+                //get attribute in ServletContext
+                Map<String, String> siteMap
+                        = (Map<String, String>) context.getAttribute("SITE_MAP");
+                //get value of label 
+                String signInErrrorPage = siteMap.get(url);
+                url = signInErrrorPage;
+                
                 RequestDispatcher rd = request.getRequestDispatcher(url);
                 rd.forward(request, response);
             } else {
