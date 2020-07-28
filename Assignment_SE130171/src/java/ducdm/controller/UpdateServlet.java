@@ -66,10 +66,10 @@ public class UpdateServlet extends HttpServlet {
         AccountUpdateErrors updateError = new AccountUpdateErrors();
 
         try {
-            if (password.trim().length() < 6 || password.trim().length() > 30) {
+            if (password.trim().length() < 8 || password.trim().length() > 30) {
                 error = true;
                 updateError.setPasswordLengthErr("Password of the account "
-                        + " must have 6 - 30 characters");
+                        + " must have 8 - 30 characters");
             }//end if the length of password doesn't have 8-30 characters 
             if (error) {
                 request.setAttribute("UPDATEERRORS", updateError);

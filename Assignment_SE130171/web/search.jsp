@@ -36,7 +36,7 @@
                                 <th>Username</th>
                                 <th>Password</th>
                                 <th>Full name</th>
-                                <th>Role</th>
+                                <th>Admin</th>
                                 <th>Delete</th>
                                 <th>Update</th>
                             </tr>

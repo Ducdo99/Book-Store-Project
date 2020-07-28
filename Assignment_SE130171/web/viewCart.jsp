@@ -36,11 +36,9 @@
                                 <tr>
                                     <td>
                                         ${counter.count}
-                                        .</td>
+                                    .</td>
                                     <td>
                                         ${book.value.bookName} 
-                                        <input type="hidden" name="txtBookName" 
-                                               value="${book.value.bookName}" />
                                     </td>
                                     <td>
                                         ${book.value.quantity}
