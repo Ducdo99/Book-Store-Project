@@ -9,18 +9,22 @@ and open the template in the editor.
         <title>Login</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     </head>
     <body>
-        <h1>
-            Login Page
-        </h1> 
+        <h1>Login Page</h1> 
 
         <form action="login" method="POST"> 
             <input type="text" name="txtUsername" value="" 
-                   placeholder="Username..." /> <br/> <br/>
+                   placeholder="Username..." 
+                   required=""/> <br/> <br/>
             <input type="password" name="txtPassword" 
                    value="" 
-                   placeholder="Password..."/> <br/>  <br/>
+                   placeholder="Password..."
+                   required=""/> <br/>  <br/>
+            <div class="g-recaptcha" 
+                 data-sitekey="6LeCQrYZAAAAAHCy4wTRaUPKRZEB5tgBirsaYCIV" ></div>
+            <br/>
             <input type="submit" value="Sign In" 
                    name="btAction"/> 
             <input type="reset" value="Reset" /> <br/> <br/>

@@ -7,10 +7,15 @@ package ducdm.controller;
 
 import ducdm.account.AccountDAO;
 import ducdm.account.AccountDTO;
+import ducdm.account.AccountSignInErrors;
+import ducdm.util.VerifyRecaptchaUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.Map;
 import javax.naming.NamingException;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +27,8 @@ import javax.servlet.http.HttpSession;
  * @author MinhDuc
  */
 public class LoginServlet extends HttpServlet {
-    private final String INVALID_PAGE = "invalidPage";
+
+    private final String SIGN_IN_ERROR_PAGE = "loginErrorPage";
     private final String SEARCH_PAGE = "searchPage";
 
     /**
@@ -40,29 +46,77 @@ public class LoginServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         String username = request.getParameter("txtUsername");
         String password = request.getParameter("txtPassword");
-        String url = INVALID_PAGE;
-
+        String url = SIGN_IN_ERROR_PAGE;
+        boolean isVerified = false;
+        boolean foundErr = false;
         try {
-            AccountDAO dao = new AccountDAO();
-            boolean result = dao.checkLogin(username, password);
-            if (result) {
-                AccountDTO accountInfo = dao.getAccountInfo();
-                String userNameAccount = accountInfo.getUsername(); // get user name of account
-                String lastname = accountInfo.getLastname(); //get last name of account
-                boolean role = accountInfo.isIsAdmin(); //get role of account
-                
-                HttpSession session = request.getSession();
-                session.setAttribute("USERNAME", userNameAccount);
-                session.setAttribute("LASTNAME", lastname);
-                session.setAttribute("ROLE", role);
-                url = SEARCH_PAGE;
-            }//end if account is existed
+            AccountSignInErrors signInErr = new AccountSignInErrors();
+            if (username.trim().length() < 6 || username.trim().length() > 20) {
+                foundErr = true;
+                signInErr.setIncorrectUsernameOrPasswordErr(
+                        "Incorrect Username or Password!!");
+            }//end if username out range of 6-20 characters
+
+            if (password.trim().length() < 8 || password.trim().length() > 30) {
+                foundErr = true;
+                signInErr.setIncorrectUsernameOrPasswordErr(
+                        "Incorrect Username or Password!!");
+            }//end if passowrd out range of 6-20 characters
+
+            String reCaptchaResponse = request.getParameter("g-recaptcha-response");
+            isVerified = VerifyRecaptchaUtil.isVerified(reCaptchaResponse);
+            if (isVerified == false) {
+                foundErr = true;
+                signInErr.setDoNotClickOnReCaptchaErr(
+                        "Please verify that you are not a robot!!");
+            }//end if user does not verify
+
+            if (foundErr) {
+                request.setAttribute("SIGN_IN_ERRORS", signInErr);
+                //get ServletContext
+                ServletContext context = request.getServletContext();
+                //get attribute in ServletContext
+                Map<String, String> siteMap
+                        = (Map<String, String>) context.getAttribute("SITE_MAP");
+                //get value of label 
+                String signInErrrorPage = siteMap.get(url);
+                url = signInErrrorPage;
+            } else {
+                AccountDAO dao = new AccountDAO();
+                boolean result = dao.checkLogin(username, password);
+                if (result) {
+                    AccountDTO accountInfo = dao.getAccountInfo();
+                    String userNameAccount = accountInfo.getUsername(); // get user name of account
+                    String lastname = accountInfo.getLastname(); //get last name of account
+                    boolean role = accountInfo.isIsAdmin(); //get role of account
+
+                    HttpSession session = request.getSession();
+                    session.setAttribute("USERNAME", userNameAccount);
+                    session.setAttribute("LASTNAME", lastname);
+                    session.setAttribute("ROLE", role);
+                    url = SEARCH_PAGE;
+                }//end if account is existed
+                else {
+                    foundErr = true;
+                    signInErr.setIncorrectUsernameOrPasswordErr(
+                            "Incorrect Username or Password!!");
+                    request.setAttribute("SIGN_IN_ERRORS", signInErr);
+                }
+            }//end if user click on reCaptcha
         } catch (SQLException ex) {
             log("LoginServlet_SQL: " + ex.getMessage());
         } catch (NamingException ex) {
             log("LoginServlet_NAMING: " + ex.getMessage());
+        } catch (IOException ex) {
+            log("LoginServlet_IO: " + ex.getMessage());
         } finally {
-            response.sendRedirect(url);
+            if (foundErr) {
+                RequestDispatcher rd = request.getRequestDispatcher(url);
+                rd.forward(request, response);
+            } else {
+                response.sendRedirect(url);
+            }
+
             out.close();
         }
     }
@@ -94,6 +148,19 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
+//        try {
+//            String username = request.getParameter("txtUsername");
+//            String password = request.getParameter("txtPassword");
+//            String reCaptchaResponse = request.getParameter("g-recaptcha-response");
+//            System.out.println("Value of 'g-recaptcha-response' params \t: " + reCaptchaResponse);
+//            boolean isVerified = VerifyRecaptchaUtil.isVerified(reCaptchaResponse);
+//
+//            //get servlet config init params
+//            if
+//        } finally {
+//
+//        }
+
     }
 
     /**

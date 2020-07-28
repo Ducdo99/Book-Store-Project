@@ -19,6 +19,7 @@ public class AccountCreateNewErrors implements Serializable {
     private String fullnameLengthErr;
     private String usernamIsExisted;
     private String usernamBeDisable;
+    private String doNotClickOnReCaptchaErr;
 
     public AccountCreateNewErrors() {
     }
@@ -105,5 +106,19 @@ public class AccountCreateNewErrors implements Serializable {
      */
     public void setUsernamBeDisable(String usernamBeDisable) {
         this.usernamBeDisable = usernamBeDisable;
+    }
+
+    /**
+     * @return the doNotClickOnReCaptchaErr
+     */
+    public String getDoNotClickOnReCaptchaErr() {
+        return doNotClickOnReCaptchaErr;
+    }
+
+    /**
+     * @param doNotClickOnReCaptchaErr the doNotClickOnReCaptchaErr to set
+     */
+    public void setDoNotClickOnReCaptchaErr(String doNotClickOnReCaptchaErr) {
+        this.doNotClickOnReCaptchaErr = doNotClickOnReCaptchaErr;
     }
 }

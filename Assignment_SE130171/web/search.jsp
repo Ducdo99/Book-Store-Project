@@ -15,14 +15,7 @@
     <body>
         <c:set var="fullname" value="${sessionScope.LASTNAME}"/>
         <c:if test="${not empty fullname}"> 
-            <form action="logout" method="POST"> 
-                <h2>
-                    <font color="red"> 
-                    Welcome, ${fullname}
-                    </font> 
-                </h2>
-                <input type="submit" value="Sign Out" name="btAction" />
-            </form>
+            <jsp:include page="welcomeUser.jsp" flush="true"/>
             <h1>Search Page</h1>  
             <form action="searchAccount"> 
                 <input type="text" name="txtSearchValue" 

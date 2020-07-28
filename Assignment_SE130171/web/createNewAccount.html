@@ -9,6 +9,7 @@ and open the template in the editor.
         <title>Create New</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     </head>
     <body>
         <h1>Create New Account</h1> 
@@ -20,7 +21,7 @@ and open the template in the editor.
             <input type="password" name="txtPassword" 
                    value="" 
                    placeholder="Password..." 
-                   />* (6 - 30 characters) <br/> <br/>
+                   />* (8 - 30 characters) <br/> <br/>
             <input type="password" name="txtConfirmPassword" 
                    value="" 
                    placeholder="Confirm..."
@@ -29,6 +30,9 @@ and open the template in the editor.
                    value="" 
                    placeholder="Full name..." 
                    />* (2 - 50 characters) <br/>  <br/>
+            <div class="g-recaptcha" 
+                 data-sitekey="6LeCQrYZAAAAAHCy4wTRaUPKRZEB5tgBirsaYCIV" ></div>
+            <br/>
             <input type="submit" value="Create New Account" name="btAction" /> 
             <input type="reset" value="Reset" />
         </form>

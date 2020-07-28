@@ -7,6 +7,7 @@ package ducdm.controller;
 
 import ducdm.account.AccountCreateNewErrors;
 import ducdm.account.AccountDAO;
+import ducdm.util.VerifyRecaptchaUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -48,7 +49,7 @@ public class CreateNewAccountServlet extends HttpServlet {
         String password = request.getParameter("txtPassword");
         String confirmPassword = request.getParameter("txtConfirmPassword");
         String fullName = request.getParameter("txtFullName");
-
+        boolean isVerified = false;
         String url = CREATE_NEW_ERROR_PAGE;
 
         boolean foundErr = false;
@@ -61,10 +62,10 @@ public class CreateNewAccountServlet extends HttpServlet {
                     createNewError.setUsernameLengthErr(
                             "Username is required input 6 - 20 characters");
                 }
-                if (password.trim().length() < 6 || password.trim().length() > 30) {
+                if (password.trim().length() < 8 || password.trim().length() > 30) {
                     foundErr = true;
                     createNewError.setPasswordLengthErr(
-                            "Password is required input 6 - 30 characters");
+                            "Password is required input 8 - 30 characters");
                 } else if (!confirmPassword.trim().equalsIgnoreCase(password.trim())) {
                     foundErr = true;
                     createNewError.setConfirmNotMatchedErr(
@@ -75,6 +76,14 @@ public class CreateNewAccountServlet extends HttpServlet {
                     createNewError.setFullnameLengthErr(
                             "Full name is required input 2 - 50 characters");
                 }
+
+                String reCaptchaResponse = request.getParameter("g-recaptcha-response");
+                isVerified = VerifyRecaptchaUtil.isVerified(reCaptchaResponse);
+                if (isVerified == false) {
+                    foundErr = true;
+                    createNewError.setDoNotClickOnReCaptchaErr(
+                            "Please verify that you are not a robot!!");
+                }//end if user does not verify
 
                 int isExisted = dao.getStatusAccount(username.trim());
                 if (isExisted == 0) {

@@ -33,7 +33,7 @@
             <input type="password" name="txtPassword" 
                    value="" 
                    placeholder="Password..." 
-                   />* (6 - 30 characters) <br/> 
+                   />* (8 - 30 characters) <br/> 
             <c:if test="${not empty errors.passwordLengthErr}">
                 <font color="red">
                 ${errors.passwordLengthErr} <br/> 
@@ -58,6 +58,12 @@
                 ${errors.fullnameLengthErr} <br/> 
                 </font>
             </c:if><br/>
+            <jsp:include page="reCaptcha.html" flush="true"/>
+            <c:if test="${not empty errors.doNotClickOnReCaptchaErr}"> 
+                <font color="red">
+                ${errors.doNotClickOnReCaptchaErr} <br/>
+                </font>
+            </c:if> <br/>
             <input type="submit" value="Create New Account" name="btAction" /> 
             <input type="reset" value="Reset" /> <br/> 
             <c:if test="${not empty errors.usernamIsExisted}">

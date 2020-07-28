@@ -1,6 +1,6 @@
 =login.html
 loginPage=login.html
-invalidPage=invalid.html
+loginErrorPage=login.jsp
 searchPage=search.jsp
 store=shoppingStore.jsp
 viewCartPage=viewCart.jsp
