@@ -7,9 +7,12 @@ package ducdm.controller;
 
 import ducdm.account.AccountCreateNewErrors;
 import ducdm.account.AccountDAO;
+import ducdm.util.Utils;
 import ducdm.util.VerifyRecaptchaUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Map;
 import javax.naming.NamingException;
@@ -77,14 +80,14 @@ public class CreateNewAccountServlet extends HttpServlet {
                             "Full name is required input 2 - 50 characters");
                 }
 
-                String reCaptchaResponse = request.getParameter("g-recaptcha-response");
-                isVerified = VerifyRecaptchaUtil.isVerified(reCaptchaResponse);
-                if (isVerified == false) {
-                    foundErr = true;
-                    createNewError.setDoNotClickOnReCaptchaErr(
-                            "Please verify that you are not a robot!!");
-                }//end if user does not verify
-
+//                String reCaptchaResponse = request.getParameter("g-recaptcha-response");
+//                isVerified = VerifyRecaptchaUtil.isVerified(reCaptchaResponse);
+//                if (isVerified == false) {
+//                    foundErr = true;
+//                    createNewError.setDoNotClickOnReCaptchaErr(
+//                            "Please verify that you are not a robot!!");
+//                }//end if user does not verify
+                
                 int isExisted = dao.getStatusAccount(username.trim());
                 if (isExisted == 0) {
                     foundErr = true;
@@ -93,18 +96,11 @@ public class CreateNewAccountServlet extends HttpServlet {
 
                 if (foundErr) {
                     request.setAttribute("CREATE_ERRORS", createNewError);
-                    //get ServletContext
-                    ServletContext context = request.getServletContext();
-                    //get attribute in ServletContext
-                    Map<String, String> siteMap
-                            = (Map<String, String>) context.getAttribute("SITE_MAP");
-                    //get value of label 
-                    String registsAccountErrrorPage = siteMap.get(url);
-                    url = registsAccountErrrorPage;
                 } else {
+                    String hashPassword = Utils.encryptBySHA256(password.trim());
                     boolean result
                             = dao.createNewAccount(username,
-                                    password, fullName, false);
+                                    hashPassword, fullName, false);
                     if (result) {
                         url = LOGIN_PAGE;
                     }
@@ -121,8 +117,24 @@ public class CreateNewAccountServlet extends HttpServlet {
             }
         } catch (NamingException ex) {
             log("CreateNewAccountServlet_NAMING: " + ex.getMessage());
+        } catch (NoSuchAlgorithmException ex) {
+            log("CreateNewAccountServlet_NOSUCHAlGORITHM: " + ex.getMessage());
+        } catch (UnsupportedEncodingException ex) {
+            log("CreateNewAccountServlet_UNSUPPORTEDENCODING: "
+                    + ex.getMessage());
+//        } catch (IOException ex) {
+//            log("LoginServlet_IO: " + ex.getMessage());
         } finally {
             if (foundErr) {
+                //get ServletContext
+                ServletContext context = request.getServletContext();
+                //get attribute in ServletContext
+                Map<String, String> siteMap
+                        = (Map<String, String>) context.getAttribute("SITE_MAP");
+                //get value of label 
+                String registsAccountErrrorPage = siteMap.get(url);
+                url = registsAccountErrrorPage;
+
                 RequestDispatcher rd = request.getRequestDispatcher(url);
                 rd.forward(request, response);
             } else {

@@ -9,9 +9,12 @@ import ducdm.account.AccountDAO;
 import ducdm.account.AccountDTO;
 import ducdm.account.AccountSignInErrors;
 import ducdm.cart.CartObject;
+import ducdm.util.Utils;
 import ducdm.util.VerifyRecaptchaUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Map;
 import javax.naming.NamingException;
@@ -66,20 +69,21 @@ public class LoginServlet extends HttpServlet {
                         "Incorrect Username or Password!!");
             }//end if passowrd out range of 6-20 characters
 
-            String reCaptchaResponse = request.getParameter("g-recaptcha-response");
-            isVerified = VerifyRecaptchaUtil.isVerified(reCaptchaResponse);
-            if (isVerified == false) {
-                foundErr = true;
-                signInErr.setDoNotClickOnReCaptchaErr(
-                        "Please verify that you are not a robot!!");
-            }//end if user does not verify
-            
+//            String reCaptchaResponse = request.getParameter("g-recaptcha-response");
+//            isVerified = VerifyRecaptchaUtil.isVerified(reCaptchaResponse);
+//            if (isVerified == false) {
+//                foundErr = true;
+//                signInErr.setDoNotClickOnReCaptchaErr(
+//                        "Please verify that you are not a robot!!");
+//            }//end if user does not verify
+
             if (foundErr) {
                 //set error into attribute
                 request.setAttribute("SIGN_IN_ERRORS", signInErr);
             } else {
                 AccountDAO dao = new AccountDAO();
-                boolean result = dao.checkLogin(username, password);
+                String hashPassword = Utils.encryptBySHA256(password.trim());
+                boolean result = dao.checkLogin(username, hashPassword);
                 if (result) {
                     AccountDTO accountInfo = dao.getAccountInfo();
                     String userNameAccount = accountInfo.getUsername(); // get user name of account
@@ -96,8 +100,8 @@ public class LoginServlet extends HttpServlet {
                     else if (role == false) {
                         url = LOAD_DATA_SERVLET;
                     }//end if account being signed in which is not admin
-                    CartObject cartObject = 
-                            (CartObject) session.getAttribute("CART");
+                    CartObject cartObject
+                            = (CartObject) session.getAttribute("CART");
                     if (cartObject != null) {
                         url = CONFIRM_PAGE;
                     }//end if cart being existed
@@ -113,8 +117,12 @@ public class LoginServlet extends HttpServlet {
             log("LoginServlet_SQL: " + ex.getMessage());
         } catch (NamingException ex) {
             log("LoginServlet_NAMING: " + ex.getMessage());
-        } catch (IOException ex) {
-            log("LoginServlet_IO: " + ex.getMessage());
+        } catch (NoSuchAlgorithmException ex) {
+            log("LoginServlet_NOSUCHAlGORITHM: " + ex.getMessage());
+        } catch (UnsupportedEncodingException ex) {
+            log("LoginServlet_UNSUPPORTEDENCODING: " + ex.getMessage());
+//        } catch (IOException ex) {
+//            log("LoginServlet_IO: " + ex.getMessage());
         } finally {
             if (foundErr) {
                 //get ServletContext
