@@ -69,13 +69,13 @@ public class LoginServlet extends HttpServlet {
                         "Incorrect Username or Password!!");
             }//end if passowrd out range of 6-20 characters
 
-//            String reCaptchaResponse = request.getParameter("g-recaptcha-response");
-//            isVerified = VerifyRecaptchaUtil.isVerified(reCaptchaResponse);
-//            if (isVerified == false) {
-//                foundErr = true;
-//                signInErr.setDoNotClickOnReCaptchaErr(
-//                        "Please verify that you are not a robot!!");
-//            }//end if user does not verify
+            String reCaptchaResponse = request.getParameter("g-recaptcha-response");
+            isVerified = VerifyRecaptchaUtil.isVerified(reCaptchaResponse);
+            if (isVerified == false) {
+                foundErr = true;
+                signInErr.setDoNotClickOnReCaptchaErr(
+                        "Please verify that you are not a robot!!");
+            }//end if user does not verify
 
             if (foundErr) {
                 //set error into attribute
@@ -121,8 +121,8 @@ public class LoginServlet extends HttpServlet {
             log("LoginServlet_NOSUCHAlGORITHM: " + ex.getMessage());
         } catch (UnsupportedEncodingException ex) {
             log("LoginServlet_UNSUPPORTEDENCODING: " + ex.getMessage());
-//        } catch (IOException ex) {
-//            log("LoginServlet_IO: " + ex.getMessage());
+        } catch (IOException ex) {
+            log("LoginServlet_IO: " + ex.getMessage());
         } finally {
             if (foundErr) {
                 //get ServletContext

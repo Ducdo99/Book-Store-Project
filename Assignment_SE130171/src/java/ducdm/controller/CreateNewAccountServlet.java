@@ -80,13 +80,13 @@ public class CreateNewAccountServlet extends HttpServlet {
                             "Full name is required input 2 - 50 characters");
                 }
 
-//                String reCaptchaResponse = request.getParameter("g-recaptcha-response");
-//                isVerified = VerifyRecaptchaUtil.isVerified(reCaptchaResponse);
-//                if (isVerified == false) {
-//                    foundErr = true;
-//                    createNewError.setDoNotClickOnReCaptchaErr(
-//                            "Please verify that you are not a robot!!");
-//                }//end if user does not verify
+                String reCaptchaResponse = request.getParameter("g-recaptcha-response");
+                isVerified = VerifyRecaptchaUtil.isVerified(reCaptchaResponse);
+                if (isVerified == false) {
+                    foundErr = true;
+                    createNewError.setDoNotClickOnReCaptchaErr(
+                            "Please verify that you are not a robot!!");
+                }//end if user does not verify
                 
                 int isExisted = dao.getStatusAccount(username.trim());
                 if (isExisted == 0) {
@@ -122,8 +122,8 @@ public class CreateNewAccountServlet extends HttpServlet {
         } catch (UnsupportedEncodingException ex) {
             log("CreateNewAccountServlet_UNSUPPORTEDENCODING: "
                     + ex.getMessage());
-//        } catch (IOException ex) {
-//            log("LoginServlet_IO: " + ex.getMessage());
+        } catch (IOException ex) {
+            log("LoginServlet_IO: " + ex.getMessage());
         } finally {
             if (foundErr) {
                 //get ServletContext
