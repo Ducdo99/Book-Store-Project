@@ -19,7 +19,7 @@ import javax.naming.NamingException;
  */
 public class CartDAO implements Serializable {
 
-    public boolean insertIntoCart(String cartID, String receiverName, 
+    public boolean insertIntoCart(String cartID, String senderName, String receiverName, 
             String receiverAddress) throws SQLException, NamingException {
         Connection con = null;
         PreparedStatement pstm = null;
@@ -27,12 +27,13 @@ public class CartDAO implements Serializable {
             con = DBHelpers.makeConnection();
             if (con != null) {
                 String insertSQL = "insert into "
-                        + "Cart(cartID, receiverName, receiverAddress) "
-                        + "values(?, ?, ?)";
+                        + "Cart(cartID, username, receiverName, receiverAddress) "
+                        + "values(?, ?, ?, ?)";
                 pstm = con.prepareStatement(insertSQL);
                 pstm.setString(1, cartID);
-                pstm.setString(2, receiverName);
-                pstm.setString(3, receiverAddress);
+                pstm.setString(2, senderName);
+                pstm.setString(3, receiverName);
+                pstm.setString(4, receiverAddress);
                 int row = pstm.executeUpdate();
                 if (row > 0) {
                     return true;

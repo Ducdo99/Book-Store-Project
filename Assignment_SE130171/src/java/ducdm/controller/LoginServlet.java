@@ -8,6 +8,7 @@ package ducdm.controller;
 import ducdm.account.AccountDAO;
 import ducdm.account.AccountDTO;
 import ducdm.account.AccountSignInErrors;
+import ducdm.cart.CartObject;
 import ducdm.util.VerifyRecaptchaUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -30,6 +31,8 @@ public class LoginServlet extends HttpServlet {
 
     private final String SIGN_IN_ERROR_PAGE = "loginErrorPage";
     private final String SEARCH_PAGE = "searchPage";
+    private final String CONFIRM_PAGE = "confirmPage";
+    private final String LOAD_DATA_SERVLET = "loadBooks";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -70,7 +73,7 @@ public class LoginServlet extends HttpServlet {
                 signInErr.setDoNotClickOnReCaptchaErr(
                         "Please verify that you are not a robot!!");
             }//end if user does not verify
-
+            
             if (foundErr) {
                 //set error into attribute
                 request.setAttribute("SIGN_IN_ERRORS", signInErr);
@@ -87,8 +90,18 @@ public class LoginServlet extends HttpServlet {
                     session.setAttribute("USERNAME", userNameAccount);
                     session.setAttribute("LASTNAME", lastname);
                     session.setAttribute("ROLE", role);
-                    url = SEARCH_PAGE;
-                }//end if account is existed
+                    if (role) {
+                        url = SEARCH_PAGE;
+                    }//end if account being signed in which is admin
+                    else if (role == false) {
+                        url = LOAD_DATA_SERVLET;
+                    }//end if account being signed in which is not admin
+                    CartObject cartObject = 
+                            (CartObject) session.getAttribute("CART");
+                    if (cartObject != null) {
+                        url = CONFIRM_PAGE;
+                    }//end if cart being existed
+                }//end if account being existed
                 else {
                     foundErr = true;
                     signInErr.setIncorrectUsernameOrPasswordErr(
@@ -112,7 +125,7 @@ public class LoginServlet extends HttpServlet {
                 //get value of label 
                 String signInErrrorPage = siteMap.get(url);
                 url = signInErrrorPage;
-                
+
                 RequestDispatcher rd = request.getRequestDispatcher(url);
                 rd.forward(request, response);
             } else {

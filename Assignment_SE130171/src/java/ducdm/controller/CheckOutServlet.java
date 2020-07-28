@@ -76,13 +76,13 @@ public class CheckOutServlet extends HttpServlet {
                             foundError = true;
                             error.setReceiverNameLengthErr(
                                     "Name is required input 2 - 50 characters");
-                        }
+                        }//end if receiver name out of range 2 - 50 characters
                         if (receiverAddress.trim().length() < 15
                                 || receiverAddress.trim().length() > 250) {
                             foundError = true;
                             error.setReceiverAddressLengthErr(
                                     "Address is required input 15 - 250 characters");
-                        }
+                        }//end if receiver address out of range 15 - 250 characters
                         if (foundError) {
                             request.setAttribute("CHECKOUT_ERROR", error);
                             //get ServletContext
@@ -92,56 +92,62 @@ public class CheckOutServlet extends HttpServlet {
                                     = (Map<String, String>) context.getAttribute("SITE_MAP");
                             //get value of label 
                             url = siteMap.get(CONFIRM_PAGE);
-                        } else {
-                            CartDAO cartDAO = new CartDAO();
-                            int cartID = 1; //default cart id will be started from 1
-                            String id = cartDAO.getMaxCartID();
+                        } //end if foundError is true
+                        else {
+                            String senderName
+                                    = (String) session.getAttribute("USERNAME");
+                            if (senderName != null) {
+                                CartDAO cartDAO = new CartDAO();
+                                int cartID = 1; //default cart id will be started from 1
+                                String id = cartDAO.getMaxCartID();
 
-                            if (id != null) {
-                                int temp = Integer.parseInt(id.trim()); //convert String type to int type
-                                cartID = temp + 1;
-                            }//end if cartID is existed
-                            id = String.valueOf(cartID); //convert int type to String type
-                            //Insert into Cart table
-                            boolean result = cartDAO.insertIntoCart(id,
-                                    receiverName, receiverAddress);
+                                if (id != null) {
+                                    int temp = Integer.parseInt(id.trim()); //convert String type to int type
+                                    cartID = temp + 1;
+                                }//end if cartID is existed
+                                id = String.valueOf(cartID); //convert int type to String type
+                                //Insert into Cart table
+                                boolean result = cartDAO.insertIntoCart(id,
+                                        senderName, receiverName,
+                                        receiverAddress);
 
-                            if (result) {
-                                BookDAO bookDAO = new BookDAO();
-                                CartDetailDAO cartDetailDAO = new CartDetailDAO();
-                                String bookID = null;
-                                String bookName = null;
-                                int quantity = 0;
-                                double price = 0;
-                                double total = 0;
-                                int bookQuantity = 0;
-                                String[] booksName
-                                        = request.getParameterValues("txtBookName");
-                                for (String name : booksName) {
-                                    BookDTO bookDTO = bookList.get(name);
-                                    bookDAO.getBookID(bookDTO);
-                                    bookID = bookDAO.getBookInfo().getBookID();
-                                    bookName = bookDTO.getBookName();
-                                    quantity = bookDTO.getQuantity();
-                                    price = bookDTO.getPrice();
-                                    total = quantity * price;
-                                    CartDetailDTO dto = new CartDetailDTO(id,
-                                            bookID, bookName, quantity,
-                                            price, total);
-                                    cartDetailDAO.insertCartDetail(dto);
-                                    //Update book quantity
-                                    bookDAO.updateQuantity(bookID, quantity); 
-                                    //get book quantity after update
-                                    bookDAO.getBookQuantityAfterUpdate(bookID);
-                                    bookQuantity = bookDAO.getBookInfo().getQuantity();
-                                    if(bookQuantity <= 1) {
-                                        bookDAO.updateStatus(bookID);
+                                if (result) {
+                                    BookDAO bookDAO = new BookDAO();
+                                    CartDetailDAO cartDetailDAO = new CartDetailDAO();
+                                    String bookID = null;
+                                    String bookName = null;
+                                    int quantity = 0;
+                                    double price = 0;
+                                    double total = 0;
+                                    int bookQuantity = 0;
+                                    String[] booksName
+                                            = request.getParameterValues("txtBookName");
+                                    for (String name : booksName) {
+                                        BookDTO bookDTO = bookList.get(name);
+                                        bookDAO.getBookID(bookDTO);
+                                        bookID = bookDAO.getBookInfo().getBookID();
+                                        bookName = bookDTO.getBookName();
+                                        quantity = bookDTO.getQuantity();
+                                        price = bookDTO.getPrice();
+                                        total = quantity * price;
+                                        CartDetailDTO dto = new CartDetailDTO(id,
+                                                bookID, bookName, quantity,
+                                                price, total);
+                                        cartDetailDAO.insertCartDetail(dto);
+                                        //Update book quantity
+                                        bookDAO.updateQuantity(bookID, quantity);
+                                        //get book quantity after update
+                                        bookDAO.getBookQuantityAfterUpdate(bookID);
+                                        bookQuantity = bookDAO.getBookInfo().getQuantity();
+                                        if (bookQuantity <= 1) {
+                                            bookDAO.updateStatus(bookID);
+                                        }
                                     }
-                                }
-                                session.removeAttribute("CART");
-                                url = SHOW_PRODUCT_PAGE;
-                            }//end if insert into Cart table sucessed
-                        }
+                                    session.removeAttribute("CART");
+                                    url = SHOW_PRODUCT_PAGE;
+                                }//end if insert into Cart table sucessed
+                            }//end if account being signed in
+                        }//end if foundError is false
                     }//end if book list is existed
                 }//end if cart is existed
             }//end if session is exsited 

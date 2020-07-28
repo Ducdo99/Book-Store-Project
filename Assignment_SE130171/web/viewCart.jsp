@@ -19,7 +19,7 @@
             <c:set var="books" value="${cart.items}"/> 
             <c:if test="${not empty books}"> 
                 <h1>Your Cart</h1> 
-                <form action="dispatchCart" method="POST">
+                <form action="removeFromCart" method="POST">
                     <table border="1">
                         <thead>
                             <tr>
@@ -37,7 +37,7 @@
                                 <tr>
                                     <td>
                                         ${counter.count}
-                                    .</td>
+                                        .</td>
                                     <td>
                                         ${book.value.bookName} 
                                     </td>
@@ -55,8 +55,7 @@
                                                value="${book.value.bookName}" 
                                                <c:if test="${not empty chkBoxRemove}">
                                                    checked="checked"
-                                               </c:if>
-                                               />
+                                               </c:if> />
                                     </td> 
                                 </tr> 
                             </c:forEach> 
@@ -74,6 +73,8 @@
                             </tr>
                         </tbody>
                     </table>
+                </form>
+                <form action="confirm">
                     <input type="submit" value="Check Out" 
                            name="btAction" />
                 </form>

@@ -7,25 +7,21 @@ package ducdm.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Map;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
  * @author MinhDuc
  */
-@WebServlet(name = "DispatchCartServlet", urlPatterns = {"/DispatchCartServlet"})
-public class DispatchCartServlet extends HttpServlet {
-
-    private final String VIEW_CART_PAGE = "viewCartPage";
+@WebServlet(name = "ConfirmServlet", urlPatterns = {"/ConfirmServlet"})
+public class ConfirmServlet extends HttpServlet {
     private final String CONFIRM_PAGE = "confirmPage";
-    private final String REMOVE_FROM_CART_SERVLET = "RemoveCartServlet";
+    private final String LOGIN_PAGE = "loginPage";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -40,25 +36,15 @@ public class DispatchCartServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        String button = request.getParameter("btAction");
-
-        String url = VIEW_CART_PAGE;
+        String url = LOGIN_PAGE;
         try {
-            if (button.equals("Remove from your cart")) {
-                url = REMOVE_FROM_CART_SERVLET;
-            } else if (button.equals("Check Out")) {
-                //get ServletContext
-                ServletContext context = request.getServletContext();
-                //get attribute in ServletContext
-                Map<String, String> siteMap
-                        = (Map<String, String>) context.getAttribute("SITE_MAP");
-                //get value of label 
-                String confirmPage = siteMap.get(CONFIRM_PAGE);
-                url = confirmPage;
+            HttpSession session = request.getSession(false);
+            String checkAccoutSignIn = (String) session.getAttribute("LASTNAME");
+            if (checkAccoutSignIn != null) {
+                url = CONFIRM_PAGE;
             }
         } finally {
-            RequestDispatcher rd = request.getRequestDispatcher(url);
-            rd.forward(request, response);
+            response.sendRedirect(url);
             out.close();
         }
     }
