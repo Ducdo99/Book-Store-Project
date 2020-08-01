@@ -19,6 +19,7 @@ import javax.naming.NamingException;
  */
 public class CartDAO implements Serializable {
 
+    //get info of receiver, sender and cartID to insert into Cart table
     public boolean insertIntoCart(String cartID, String senderName, String receiverName, 
             String receiverAddress) throws SQLException, NamingException {
         Connection con = null;
@@ -50,6 +51,7 @@ public class CartDAO implements Serializable {
         return false;
     }
 
+    //get max the number cartID in Cart table
     public String getMaxCartID() throws SQLException, NamingException {
         Connection con = null;
         PreparedStatement pstm = null;

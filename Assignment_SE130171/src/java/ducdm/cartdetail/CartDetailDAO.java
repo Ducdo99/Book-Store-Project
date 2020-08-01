@@ -18,6 +18,7 @@ import javax.naming.NamingException;
  */
 public class CartDetailDAO implements Serializable {
 
+    //insert the info of books which user checked out
     public boolean insertCartDetail(CartDetailDTO dto)
             throws SQLException, NamingException {
         Connection con = null;

@@ -32,6 +32,7 @@ public class AccountDAO implements Serializable {
         return accountList;
     }
 
+    //check username and password is existed
     public boolean checkLogin(String username, String password)
             throws SQLException, NamingException {
         Connection con = null;
@@ -147,6 +148,7 @@ public class AccountDAO implements Serializable {
         return false;
     }
 
+    //update password/role of account
     public boolean updateAccount(String username, String password, boolean isAdmin)
             throws SQLException, NamingException {
         Connection con = null;

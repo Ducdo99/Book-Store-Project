@@ -33,6 +33,7 @@ public class BookDAO implements Serializable {
         return bookList;
     }
 
+    //get all data from Book table 
     public boolean loadProductData()
             throws SQLException, NamingException {
         Connection con = null;
@@ -109,7 +110,7 @@ public class BookDAO implements Serializable {
         }
         return false;
     }
-    
+
     public boolean getBookQuantityAfterUpdate(String bookID)
             throws SQLException, NamingException {
         Connection con = null;
@@ -145,9 +146,8 @@ public class BookDAO implements Serializable {
         }
         return false;
     }
-    
-    
 
+    //Update status of book if the quantity equal 1
     public boolean updateStatus(String bookID)
             throws SQLException, NamingException {
         Connection con = null;
@@ -178,6 +178,7 @@ public class BookDAO implements Serializable {
         return false;
     }
 
+    //update the quantity of a book in Book table after user checkout
     public boolean updateQuantity(String bookID, int orederedQuantity)
             throws SQLException, NamingException {
         Connection con = null;
@@ -188,9 +189,9 @@ public class BookDAO implements Serializable {
             if (con != null) {
                 String updateSQL = "update Book "
                         + "set quantity = "
-                        + "(select quantity "
-                        + "from Book "
-                        + "where bookID = ? ) - ? "
+                        + "             (select quantity "
+                        + "              from Book "
+                        + "              where bookID = ? ) - ? "
                         + "where bookID = ?";
                 pstm = con.prepareStatement(updateSQL);
                 pstm.setString(1, bookID);
