@@ -44,14 +44,8 @@ public class SearchServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         String searchValue = request.getParameter("txtSearchValue");
-        
-        //get ServletContext
-        ServletContext context = request.getServletContext();
-        //get attribute in ServletContext
-        Map<String, String> siteMap
-                = (Map<String, String>) context.getAttribute("SITE_MAP");
-        //get value of label
-        String url = siteMap.get(SEARCH_PAGE);
+
+        String url = SEARCH_PAGE;
         try {
             if (!searchValue.equals("")) {
                 AccountDAO dao = new AccountDAO();
@@ -59,13 +53,20 @@ public class SearchServlet extends HttpServlet {
                 List<AccountDTO> accountList = dao.getAccountList();
                 request.setAttribute("SEARCHVALUE", accountList);
                 //update url
-                url = siteMap.get(SEARCH_PAGE);
+                url = SEARCH_PAGE;
             }//end if the value of searchValue has value
         } catch (SQLException ex) {
             log("SearchServlet_SQL: " + ex.getMessage());
         } catch (NamingException ex) {
             log("SearchServlet_NAMING: " + ex.getMessage());
         } finally {
+            //get ServletContext
+            ServletContext context = request.getServletContext();
+            //get attribute in ServletContext
+            Map<String, String> siteMap
+                    = (Map<String, String>) context.getAttribute("SITE_MAP");
+            //get value of label 
+            url = siteMap.get(SEARCH_PAGE);
             RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);
             out.close();

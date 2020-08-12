@@ -21,6 +21,7 @@ import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -52,38 +53,62 @@ public class LoginServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         String username = request.getParameter("txtUsername");
         String password = request.getParameter("txtPassword");
+        String rememberAccount = request.getParameter("addCookie");
         String url = SIGN_IN_ERROR_PAGE;
         boolean isVerified = false;
         boolean foundErr = false;
+        String hashPassword = null;
         try {
             AccountSignInErrors signInErr = new AccountSignInErrors();
-            if (username.trim().length() < 6 || username.trim().length() > 20) {
-                foundErr = true;
-                signInErr.setIncorrectUsernameOrPasswordErr(
-                        "Incorrect Username or Password!!");
-            }//end if username out range of 6-20 characters
+            //get the cookie name
+            String cookieName = (String) request.getAttribute("COOKIE_NAME");
 
-            if (password.trim().length() < 8 || password.trim().length() > 30) {
-                foundErr = true;
-                signInErr.setIncorrectUsernameOrPasswordErr(
-                        "Incorrect Username or Password!!");
-            }//end if passowrd out range of 6-20 characters
+            //Check cookie 
+            if (cookieName == null) {
+                if (username.trim().length() < 6 || username.trim().length() > 20) {
+                    foundErr = true;
+                    signInErr.setIncorrectUsernameOrPasswordErr(
+                            "Incorrect Username or Password!!");
+                }//end if username out range of 6-20 characters
 
-            String reCaptchaResponse = request.getParameter("g-recaptcha-response");
-            isVerified = VerifyRecaptchaUtil.isVerified(reCaptchaResponse);
-            if (isVerified == false) {
-                foundErr = true;
-                signInErr.setDoNotClickOnReCaptchaErr(
-                        "Please verify that you are not a robot!!");
-            }//end if user does not verify
+                if (password.trim().length() < 8 || password.trim().length() > 30) {
+                    foundErr = true;
+                    signInErr.setIncorrectUsernameOrPasswordErr(
+                            "Incorrect Username or Password!!");
+                }//end if passowrd out range of 6-20 characters
+
+                String reCaptchaResponse = request.getParameter("g-recaptcha-response");
+                isVerified = VerifyRecaptchaUtil.isVerified(reCaptchaResponse);
+                if (isVerified == false) {
+                    foundErr = true;
+                    signInErr.setDoNotClickOnReCaptchaErr(
+                            "Please verify that you are not a robot!!");
+                }//end if user does not verify
+            }//end if cookie is null 
 
             if (foundErr) {
                 //set error into attribute
                 request.setAttribute("SIGN_IN_ERRORS", signInErr);
             } else {
                 AccountDAO dao = new AccountDAO();
-                String hashPassword = Utils.encryptBySHA256(password.trim());
-                boolean result = dao.checkLogin(username, hashPassword);
+                
+                //Check cookie 
+                if (cookieName == null) {
+                    hashPassword = Utils.encryptBySHA256(password.trim());
+                }//end if cookie is null
+
+                if (cookieName != null) {
+                    //get the cookie value
+                    String cookieValue
+                            = (String) request.getAttribute("COOKIE_VALUE");
+                    if (cookieValue != null) {
+                        username = cookieName.trim();
+                        hashPassword = cookieValue.trim();
+                    }//end if the cookie value is not null
+                }//end if the cookie name is not null
+
+                boolean result
+                        = dao.checkLogin(username.trim(), hashPassword.trim());
                 if (result) {
                     AccountDTO accountInfo = dao.getAccountInfo();
                     String userNameAccount = accountInfo.getUsername(); // get user name of account
@@ -94,6 +119,22 @@ public class LoginServlet extends HttpServlet {
                     session.setAttribute("USERNAME", userNameAccount);
                     session.setAttribute("LASTNAME", lastname);
                     session.setAttribute("ROLE", role);
+
+                    //Check cookie 
+                    if (cookieName == null) {
+                        //Add cookie
+                        if (rememberAccount != null) {
+                            if (rememberAccount.trim().equals("true")) {
+                                //Create cookie
+                                Cookie cookie = new Cookie(
+                                        username.trim(), hashPassword.trim());
+                                //Set the max time is existed for cookie that is 3 min
+                                cookie.setMaxAge(60 * 3);
+                                //Return the cooke to client side 
+                                response.addCookie(cookie);
+                            }//end if the value of rememberAccount param is true
+                        }//end if rememeberAccount param is existed
+                    }//end if cookie is null
                     if (role) {
                         url = SEARCH_PAGE;
                     }//end if account being signed in which is admin

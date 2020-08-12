@@ -1,4 +1,3 @@
-=login.html
 loginPage=login.html
 loginErrorPage=login.jsp
 searchPage=search.jsp
@@ -7,6 +6,7 @@ viewCartPage=viewCart.jsp
 confirmPage=confirm.jsp
 registerPage=createNewAccount.html
 registerErrorPage=createNewAccount.jsp
+=CheckCookieServlet
 login=LoginServlet
 logout=LogoutServlet
 registerAccount=CreateNewAccountServlet

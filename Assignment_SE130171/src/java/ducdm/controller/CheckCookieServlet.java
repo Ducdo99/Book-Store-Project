@@ -7,22 +7,25 @@ package ducdm.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Map;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  *
  * @author MinhDuc
  */
-@WebServlet(name = "LogoutServlet", urlPatterns = {"/LogoutServlet"})
-public class LogoutServlet extends HttpServlet {
+@WebServlet(name = "CheckCookieServlet", urlPatterns = {"/CheckCookieServlet"})
+public class CheckCookieServlet extends HttpServlet {
 
     private final String LOGIN_PAGE = "loginPage";
+    private final String LOGIN_SERVLET = "login";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -38,37 +41,46 @@ public class LogoutServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         String url = LOGIN_PAGE;
-        try { 
-            //Get cookies in request parameter
-            Cookie[] cookies = request.getCookies(); 
+        boolean isCookie = false;
+        try {
+            Cookie[] cookies = request.getCookies();
             if (cookies != null) {
                 //Get last cookie in cookies
                 int cookiePosition = cookies.length - 1;
                 Cookie lastCookie = cookies[cookiePosition];
-                while (lastCookie.getName().trim().equals("JSESSIONID")) {
-                    cookiePosition--;
-                    lastCookie = cookies[cookiePosition];
-                }//end if the cookie name is not JSESSIONID 
-                
                 if (lastCookie != null) {
-                    //Set the cookie value is empty
-                    lastCookie.setValue("");  
-                    //Return cookie to client side 
-                    response.addCookie(lastCookie);
-                    url = LOGIN_PAGE;
+                    while (lastCookie.getName().trim().equals("JSESSIONID")) {
+                        cookiePosition--;
+                        lastCookie = cookies[cookiePosition];
+                    }//end if the cookie name is not JSESSIONID 
+
+                    //get the cookie name
+                    String cookieName = lastCookie.getName().trim();
+                    request.setAttribute("COOKIE_NAME", cookieName.trim());
+                    //get the cookie value
+                    String cookieValue = lastCookie.getValue().trim();
+                    request.setAttribute("COOKIE_VALUE", cookieValue.trim());
+                    url = LOGIN_SERVLET;
+                    isCookie = true;
                 }//end if the last cookie is not null
             }//end if cookies is not null
-            HttpSession session = request.getSession(false);
-            if (session != null) {
-                session.invalidate();
-                url = LOGIN_PAGE;
-            }
-
         } finally {
-            response.sendRedirect(url);
+            if (isCookie) {
+                //get ServletContext
+                ServletContext context = request.getServletContext();
+                //get attribute in ServletContext
+                Map<String, String> siteMap
+                        = (Map<String, String>) context.getAttribute("SITE_MAP");
+                //get value of label 
+                url = siteMap.get(LOGIN_SERVLET);
+                RequestDispatcher rd = request.getRequestDispatcher(url);
+                rd.forward(request, response);
+            } //end if the value isCookie is true
+            else {
+                response.sendRedirect(url);
+            }
             out.close();
         }
-
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

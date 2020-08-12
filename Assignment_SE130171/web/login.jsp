@@ -30,6 +30,8 @@
                 </font>
             </c:if>
             <br/>
+            <input type="checkbox" name="addCookie" 
+                   value="true" /> Remember this account <br/> <br/>
             <input type="submit" value="Sign In" 
                    name="btAction"/> 
             <input type="reset" value="Reset" /> <br/> <br/>
