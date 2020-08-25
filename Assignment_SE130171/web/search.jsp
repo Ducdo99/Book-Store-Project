@@ -35,7 +35,6 @@
                                 <tr>
                                     <th>No.</th>
                                     <th>Username</th>
-                                    <th>Password</th>
                                     <th>Full name</th>
                                     <th>Admin</th>
                                     <th>Delete</th>
@@ -43,8 +42,6 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <c:set var="updateError" 
-                                       value="${requestScope.UPDATEERRORS}"/> 
                                 <c:set var="usernameUpdateError" 
                                        value="${requestScope.USERNAME_UPDATE}"/> 
                                 <c:set var="deleteError" 
@@ -63,11 +60,6 @@
                                             <input type="hidden" 
                                                    name="txtUsername" 
                                                    value="${accountDTO.username}" /> 
-                                        </td>
-                                        <td>
-                                            <input type="text" name="txtPassword" 
-                                                   value="${accountDTO.password}" 
-                                                   required=""/> 
                                         </td>
                                         <td>
                                             ${accountDTO.lastname}
@@ -111,17 +103,6 @@
                                             </tr>
                                         </c:if>
                                     </c:if>
-                                    <c:if test="${not empty updateError.passwordLengthErr}"> 
-                                        <c:if test="${usernameUpdateError eq accountDTO.username}">
-                                            <tr>
-                                                <td colspan="7">
-                                                    <font color="red"> 
-                                                    ${updateError.passwordLengthErr} <br/>
-                                                    </font>
-                                                </td>
-                                            </tr>
-                                        </c:if>
-                                    </c:if> 
                                 </form> 
                             </c:forEach>
                         </tbody>

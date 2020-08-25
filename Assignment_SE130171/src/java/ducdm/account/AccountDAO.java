@@ -148,8 +148,8 @@ public class AccountDAO implements Serializable {
         return false;
     }
 
-    //update password/role of account
-    public boolean updateAccount(String username, String password, boolean isAdmin)
+    //update role of account
+    public boolean updateAccount(String username, boolean isAdmin)
             throws SQLException, NamingException {
         Connection con = null;
         PreparedStatement pstm = null;
@@ -157,12 +157,11 @@ public class AccountDAO implements Serializable {
             con = DBHelpers.makeConnection();
             if (con != null) {
                 String selectSQL = "update Account "
-                        + "set password = ?, isAdmin = ? "
+                        + "set isAdmin = ? "
                         + "where username = ?";
                 pstm = con.prepareStatement(selectSQL);
-                pstm.setString(1, password);
-                pstm.setBoolean(2, isAdmin);
-                pstm.setString(3, username);
+                pstm.setBoolean(1, isAdmin);
+                pstm.setString(2, username);
                 int row = pstm.executeUpdate();
                 if (row > 0) {
                     return true;
